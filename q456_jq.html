@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Awesome Products</title>
+  <script src="https://code.jquery.com/jquery-1.12.1.min.js" integrity="sha256-I1nTg78tSrZev3kjvfdM5A5Ak/blglGzlaZANLPDl3I=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
+</head>
+<body>
+  <script id="companies-listing" type="x-tmpl-mustache">
+    <h4 href="javascript:void(0);">{{ name }}</h4>
+    <p>{{ products }}</p>
+    <hr>
+  </script>
+  <div id="companies">Loading...</div>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $.ajax({
+        url: 'http://awesome-products.dev/companies.json',
+        type: 'GET',
+      })
+      .done(function(data) {
+        $('#companies').html("");
+        // debugger
+        data.companies.forEach(function(company, index){
+          var template = $('#companies-listing').html();
+          var renderedHtml = Mustache.render(template, company);
+          // $('#companies').append(renderedHtml).fadeIn(400);
+          setTimeout(function(){$(renderedHtml).appendTo('#companies').hide().fadeIn(500)},50*index);
+          
+        });
+      })
+      .fail(function() {
+        console.log("error");
+      })
+      .always(function() {
+        console.log("complete");
+      });
+      
+      
+    });
+  </script>
+</body>
+</html>
