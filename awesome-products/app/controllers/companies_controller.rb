@@ -5,10 +5,10 @@ class CompaniesController < ApplicationController
   # GET /companies.json
   def index
     @companies = Company.all
-    # respond_to do |wants|
-    #   wants.html { render :index }
-    #   wants.json { render json: @companies}
-    # end
+    respond_to do |wants|
+      wants.html { render :index }
+      wants.json { render json: @companies}
+    end
   end
 
   # GET /companies/1
