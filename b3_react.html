@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>React.js Hello World</title>
+    <script src="../js/react.js"></script>
+    <script src="../js/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <style type="text/css">
+    </style>
+  </head>
+  <body>
+    <div id="container-1"></div>
+
+    <script type="text/babel">
+      var baseURL = 'http://awesome-products.dev';
+      var AwesomeProducts = React.createClass({
+        getInitialState: function(){
+          return { companies: [] };
+        },
+        componentDidMount: function(){
+          $.ajax({
+            url: baseURL + '/companies.json',
+            type: 'GET',
+          })
+          .done(function(data) {
+            this.setState({companies: data.companies});
+          }.bind(this))
+          .fail(function() {
+            console.log("error");
+          })
+          .always(function() {
+            console.log("complete");
+          });
+        },
+        companyDisplay: function(){
+          if(this.state.companies.length > 0){
+            return this.state.companies.map(function(company, index){
+              var url = baseURL+'/companies/'+company.id+'/likes';
+              return <Company name={company.name} products={company.products.join(', ')} likes={company.likes} url={url} key={index}/>;
+            });
+          } else{
+            return "Loading";
+          }
+        },
+        render: function() {
+          return  <div>
+                    <h1>Welcome to AwesomeProducts</h1>
+                    {this.companyDisplay()}
+                  </div>;
+        },
+      });
+
+      var Company = React.createClass({
+        getInitialState: function(){
+          return { likes: this.props.likes };
+        },
+        handleClick: function(event){
+          event.preventDefault();
+          $.ajax({
+            url: this.props.url,
+            type: 'POST',
+          })
+          .done(function() {
+            this.setState({likes: this.state.likes + 1 });
+          }.bind(this))
+          .fail(function() {
+            console.log("error");
+          })
+          .always(function() {
+            console.log("complete");
+          });          
+        },
+        render: function() {
+          return  <div>
+                    <h2>{this.props.name}</h2>
+                    <p>{this.props.products}</p>
+                    <a href='javascript:void(0);' onClick={this.handleClick}> {this.state.likes} Likes </a>
+                    <hr />
+                  </div>
+        }
+      });
+
+
+      ReactDOM.render(<AwesomeProducts />, document.getElementById('container-1'));
+    </script>
+  </body>
+</html>

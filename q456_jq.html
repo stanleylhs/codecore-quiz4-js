@@ -4,18 +4,26 @@
   <title>Awesome Products</title>
   <script src="https://code.jquery.com/jquery-1.12.1.min.js" integrity="sha256-I1nTg78tSrZev3kjvfdM5A5Ak/blglGzlaZANLPDl3I=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
+  <style type="text/css">
+    h4.name {
+      display: inline;
+    }
+  </style>
 </head>
 <body>
   <script id="companies-listing" type="x-tmpl-mustache">
-    <h4 href="javascript:void(0);">{{ name }}</h4>
+    <h4 class="name" href="javascript:void(0);">{{ name }}</h4>
+    <span id=like-{{ id }}>{{ likes }}</span>
+    <a href="javascript:void(0);" data-id="{{ id }}">Like</a>
     <p>{{ products }}</p>
     <hr>
   </script>
   <div id="companies">Loading...</div>
   <script type="text/javascript">
+    var baseURL = 'http://awesome-products.dev';
     $(document).ready(function(){
       $.ajax({
-        url: 'http://awesome-products.dev/companies.json',
+        url: baseURL + '/companies.json',
         type: 'GET',
       })
       .done(function(data) {
@@ -26,7 +34,6 @@
           var renderedHtml = Mustache.render(template, company);
           // $('#companies').append(renderedHtml).fadeIn(400);
           setTimeout(function(){$(renderedHtml).appendTo('#companies').hide().fadeIn(500)},50*index);
-          
         });
       })
       .fail(function() {
@@ -35,8 +42,24 @@
       .always(function() {
         console.log("complete");
       });
-      
-      
+      $('#companies').on('click', 'a', function(event) {
+        event.preventDefault();
+        $.ajax({
+          url: baseURL + '/companies/'+ $(this).data('id') +'/likes',
+          type: 'POST',
+        })
+        .done(function() {
+          $('#like-'+ $(this).data('id')).text(function(i, val) { return +val+1 });
+        }.bind(this))
+        .fail(function() {
+          console.log("error");
+        })
+        .always(function() {
+          console.log("complete");
+        });
+        
+        /* Act on the event */
+      });
     });
   </script>
 </body>
